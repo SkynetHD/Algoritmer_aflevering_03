@@ -17,8 +17,8 @@ class Cell {
         this.visited = false;
     }
 
-    draw(ctx, cellWidth) {
-        ctx.strokeStyle = '#000000';
+    draw(ctx, cellWidth, cols, rows) {//Eget flair
+        ctx.strokeStyle = '#4a0080';
         ctx.lineWidth = 4;
         ctx.beginPath();
 
@@ -126,13 +126,14 @@ class Cell {
 }
 
 class Maze {
-    constructor(cols, rows, canvas) {
+    constructor(cols, rows, canvas, randomness = 25) {
         this.grid = [];
         this.cols = cols;
         this.rows = rows;
         this.canvas = canvas;
         this.ctx = canvas.getContext('2d');
         this.cellWidth = canvas.width / cols;
+        this.randomness = randomness; // Rando
         this.initializeGrid();
     }
 
@@ -148,7 +149,7 @@ class Maze {
     draw() {
         for (let i = 0; i < this.rows; i += 1) {
             for (let j = 0; j < this.cols; j += 1) {
-                this.grid[i][j].draw(this.ctx, this.cellWidth);
+                this.grid[i][j].draw(this.ctx, this.cellWidth, this.cols, this.rows);
             }
         }
     }
@@ -179,7 +180,14 @@ class Maze {
                 currentCell = randomNeighborCell;
                 currentCell.visited = true;
             } else {
-                currentCell = stack.pop();
+                // Gør rando stuff. 25% chance
+                if (stack.length > 0 && Math.random() * 100 < this.randomness) {
+                    const randomIndex = randomInteger(0, stack.length);
+                    currentCell = stack[randomIndex];
+                    stack.splice(randomIndex, 1);
+                } else {
+                    currentCell = stack.pop();
+                }
             }
         }
     }
